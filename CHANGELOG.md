@@ -20,6 +20,7 @@ Docs: https://docs.openclaw.ai
 
 ### Fixes
 
+- Android/Voice screen TTS: stream assistant speech via ElevenLabs WebSocket in Talk Mode, stop cleanly on speaker mute/barge-in, and ignore stale out-of-order stream events. (#29521) Thanks @gregmousseau.
 - Web UI/Cron: include configured agent model defaults/fallbacks in cron model suggestions so scheduled-job model autocomplete reflects configured models. (#29709)
 - CLI/Cron: clarify `cron list` output by renaming `Agent` to `Agent ID` and adding a `Model` column for isolated agent-turn jobs. (#26259)
 - Cron/Delivery: disable the agent messaging tool when `delivery.mode` is `"none"` so cron output is not sent to Telegram or other channels. (#21808)
@@ -80,13 +81,17 @@ Docs: https://docs.openclaw.ai
 
 ### Fixes
 
+- Cron/Failure alerts: add configurable repeated-failure alerting with per-job overrides and Web UI cron editor support (`inherit|disabled|custom` with threshold/cooldown/channel/target fields). (#24789) Thanks xbrak.
 - Cron/Isolated model defaults: resolve isolated cron `subagents.model` (including object-form `primary`) through allowlist-aware model selection so isolated cron runs honor subagent model defaults unless explicitly overridden by job payload model. (#11474) Thanks @AnonO6.
 - Cron/Isolated sessions list: persist the intended pre-run model/provider on isolated cron session entries so `sessions_list` reflects payload/session model overrides even when runs fail before post-run telemetry persistence. (#21279) Thanks @altaywtf.
+- Web UI/Chat sessions: add a cron-session visibility toggle in the session selector, fix cron-key detection across `cron:*` and `agent:*:cron:*` formats, and localize the new control labels/tooltips. (#26976) Thanks @ianderrington.
+- Web UI/Cron jobs: add schedule-kind and last-run-status filters to the Jobs list, with reset control and client-side filtering over loaded results. (#9510) Thanks @guxu11.
 - Cron/One-shot reliability: retry transient one-shot failures with bounded backoff and configurable retry policy before disabling. (#24435) Thanks .
 - Gateway/Cron auditability: add gateway info logs for successful cron create, update, and remove operations. (#25090) Thanks .
 - Cron/Schedule errors: notify users when a job is auto-disabled after repeated schedule computation failures. (#29098) Thanks .
 - Cron/Schedule errors: notify users when a job is auto-disabled after repeated schedule computation failures. (#29098) Thanks .
 - File tools/tilde paths: expand `~/...` against the user home directory before workspace-root checks in host file read/write/edit paths, while preserving root-boundary enforcement so outside-root targets remain blocked. (#29779) Thanks @Glucksberg.
+- Slack/HTTP mode startup: treat Slack HTTP accounts as configured when `botToken` + `signingSecret` are present (without requiring `appToken`) in channel config/runtime status so webhook mode is not silently skipped. (#30567)
 - Onboarding/Custom providers: raise default custom-provider model context window to the runtime hard minimum (16k) and auto-heal existing custom model entries below that threshold during reconfiguration, preventing immediate `Model context window too small (4096 tokens)` failures. (#21653) Thanks @r4jiv007.
 - Web UI/Assistant text: strip internal `<relevant-memories>...</relevant-memories>` scaffolding from rendered assistant messages (while preserving code-fence literals), preventing memory-context leakage in chat output for models that echo internal blocks. (#29851) Thanks @Valkster70.
 - Dashboard/Sessions: allow authenticated Control UI clients to delete and patch sessions while still blocking regular webchat clients from session mutation RPCs, fixing Dashboard session delete failures. (#21264) Thanks @jskoiz.
@@ -94,6 +99,7 @@ Docs: https://docs.openclaw.ai
 - Agents/Session status: read thinking/verbose/reasoning levels from persisted session state in `session_status` output when resolved levels are not provided, so status reflects runtime toggles correctly. (#30129) Thanks @YuzuruS.
 - TUI/SIGTERM shutdown: ignore `setRawMode EBADF` teardown errors during `SIGTERM` exit so long-running TUI sessions do not crash on terminal shutdown races, while still rethrowing unrelated stop errors. (#29430) Thanks @Cormazabal.
 - Memory/Hybrid recall: when strict hybrid scoring yields no hits, preserve keyword-backed matches using a text-weight floor so freshly indexed lexical canaries no longer disappear behind `minScore` filtering. (#29112) Thanks @ceo-nada.
+- Android/Notifications auth race: return `NOT_AUTHORIZED` when `POST_NOTIFICATIONS` is revoked between authorization precheck and delivery, instead of returning success while dropping the notification. (#30726) Thanks @obviyus.
 - Cron/Reminder session routing: preserve `job.sessionKey` for `sessionTarget="main"` runs so queued reminders wake and deliver in the originating scoped session/channel instead of being forced to the agent main session.
 - Agents/Sessions list transcript paths: resolve `sessions_list` `transcriptPath` via agent-aware session path options and ignore combined-store sentinel paths (`(multiple)`) so listed transcript paths always point to the state directory. (#28379) Thanks @fafuzuoluo.
 - Podman/Quadlet setup: fix `sed` escaping and UID mismatch in Podman Quadlet setup. (#26414) Thanks @KnHack and @vincentkoc.
